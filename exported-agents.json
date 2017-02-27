@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "name": "新京报",
+  "description": "No description provided",
+  "source_url": false,
+  "guid": "1b6244910258d660be72fcf2a47085e9",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#5bc0de",
+  "icon": "gear",
+  "exported_at": "2017-02-27T19:22:41Z",
+  "agents": [
+    {
+      "type": "Agents::DataOutputAgent",
+      "name": "新京报 #7 输出RSS",
+      "disabled": false,
+      "guid": "2dcdf4b44c9e5e1defe61661a559876a",
+      "options": {
+        "secrets": [
+          "bjnews3"
+        ],
+        "expected_receive_period_in_days": "5",
+        "template": {
+          "title": "新京报",
+          "description": "新京报电子版 http://epaper.bjnews.com.cn",
+          "item": {
+            "title": "【{{section_clean}}】{{title}}",
+            "description": "{{content1 | regex_replace: '\\.\\./\\.\\./\\.\\./images', 'http://epaper.bjnews.com.cn/images'}}<br><br>{{content2}}",
+            "pubDate": "{{created_at | date: \"%s\" | plus: _index_ | date: \"%FT%T\"}}",
+            "link": "{{url}}"
+          },
+          "link": "http://epaper.bjnews.com.cn"
+        },
+        "events_to_show": "150"
+      },
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "新京报 #6 过滤无用版面",
+      "disabled": false,
+      "guid": "659d6c1a1d3e5b1b478b02d65fbb489b",
+      "options": {
+        "expected_receive_period_in_days": "5",
+        "keep_event": "true",
+        "rules": [
+          {
+            "type": "!regex",
+            "value": "(家居周刊)|(书评周刊)|(气象)|(广告)|(北京新闻)|(来信)|(旅游周刊)|(汽车周刊)|(上市公司)|(食品周刊)|(楼市)",
+            "path": "section_clean"
+          }
+        ],
+        "message": "Looks like your pattern matched in '{{value}}'!"
+      },
+      "keep_events_for": 86400,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "新京报 #2 抓取版面目录",
+      "disabled": false,
+      "guid": "68283ad7f636260ca5fa7e85f7b8cfe2",
+      "options": {
+        "expected_update_period_in_days": "5",
+        "url_from_event": "{{section_url | replace: '0; URL=', 'http://epaper.bjnews.com.cn/'}}",
+        "type": "html",
+        "mode": "merge",
+        "extract": {
+          "sec_url": {
+            "css": "#artcile_list_wapper a",
+            "value": "@href"
+          }
+        }
+      },
+      "schedule": "every_5h",
+      "keep_events_for": 432000,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::EventFormattingAgent",
+      "name": "新京报 #5 清理版面字段格式",
+      "disabled": false,
+      "guid": "6cf19e9ea7d107d2002dec9fedd784f2",
+      "options": {
+        "instructions": {
+          "section_clean": "{{section | regex_replace: '[\\s\\S]*：(\\S*)[\\s\\S]*', '\\1'}}"
+        },
+        "mode": "merge"
+      },
+      "keep_events_for": 432000,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "新京报 #3 抓取文章目录",
+      "disabled": false,
+      "guid": "7c2b15be971353d0358de6dc5a67bab5",
+      "options": {
+        "expected_update_period_in_days": "5",
+        "url_from_event": "{{section_url | regex_replace: '0; URL=(.*)node.*', 'http://epaper.bjnews.com.cn/\\1'}}{{sec_url}}",
+        "type": "html",
+        "mode": "on_change",
+        "extract": {
+          "url": {
+            "css": ".jcul a",
+            "value": "@href"
+          }
+        },
+        "template": {
+          "url": "{{ url | to_uri: _response_.url }}"
+        }
+      },
+      "schedule": "every_5h",
+      "keep_events_for": 432000,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "新京报 #1 抓取最新一期地址",
+      "disabled": false,
+      "guid": "a948abc8bb5723d5107311b20d70494c",
+      "options": {
+        "expected_update_period_in_days": "5",
+        "url": "http://epaper.bjnews.com.cn",
+        "type": "html",
+        "mode": "on_change",
+        "extract": {
+          "section_url": {
+            "css": "head meta[http-equiv=\"REFRESH\"]",
+            "value": "@content"
+          }
+        }
+      },
+      "schedule": "every_5h",
+      "keep_events_for": 432000,
+      "propagate_immediately": false
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "新京报 #4 抓取全文",
+      "disabled": false,
+      "guid": "c2580c58f1b0eb807a463d7d7f0b1094",
+      "options": {
+        "expected_update_period_in_days": "5",
+        "url_from_event": "{{url}}",
+        "type": "html",
+        "mode": "merge",
+        "extract": {
+          "section": {
+            "css": ".rit dl.jct dd",
+            "value": ".//text()"
+          },
+          "title": {
+            "css": ".rit h1",
+            "value": ".//text()"
+          },
+          "content1": {
+            "css": ".rit .tpnr",
+            "value": "."
+          },
+          "content2": {
+            "css": ".rit .contnt founder-content",
+            "value": "."
+          },
+          "sub_title": {
+            "css": ".rit .fbiaot",
+            "value": ".//text()"
+          }
+        },
+        "events_order": [
+          [
+            "{{url | regex_replace: '.*?(\\d{4})-(\\d{2})\\/(\\d{2}).*', '\\1\\2\\3'}}",
+            "string",
+            true
+          ]
+        ],
+        "include_sort_info": "true"
+      },
+      "schedule": "every_5h",
+      "keep_events_for": 432000,
+      "propagate_immediately": true
+    }
+  ],
+  "links": [
+    {
+      "source": 1,
+      "receiver": 0
+    },
+    {
+      "source": 2,
+      "receiver": 4
+    },
+    {
+      "source": 3,
+      "receiver": 1
+    },
+    {
+      "source": 4,
+      "receiver": 6
+    },
+    {
+      "source": 5,
+      "receiver": 2
+    },
+    {
+      "source": 6,
+      "receiver": 3
+    }
+  ],
+  "control_links": [
+
+  ]
+}
