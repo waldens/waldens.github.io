@@ -8,15 +8,15 @@
 <style id="zoomLevel-styles"></style></head>
 <body>
 <h1 id="changes-from-v1-1-to-v2-0">v1.1到v2.0的改动</h1>
-<h2 id="language">Language</h2>
+<h2 id="language">语法</h2>
 <h3 id="legacy-syntax-removed">删除遗留语法</h3>
 <p>删除字面量赋值: <code>var = value</code></p>
-<p>删除 <code>If Var =|&lt;&gt;|&lt;|&gt;|&lt;=|&gt;= Value</code>; 这些现在都被解释为表达式.</p>
+<p>删除 <code>If Var =|&lt;&gt;|&lt;|&gt;|&lt;=|&gt;= Value</code>; 这些现在被解释为表达式.</p>
 <h3 id="variables">变量</h3>
 <p>变量名称不能以数字开头, 并且不能包含以前允许的这些字符: <code>@ # $</code>. 只允许字母、数字、下划线和非ASCII字符.</p>
-<p>控制流语句的名称，不能用作变量、函数、类或窗口组名称. 这包括If, Else, Loop, LoopFiles, LoopRead, LoopReg, LoopParse, For, While, Until, Break, Continue, Goto, Gosub, Return, Try, Catch, Finally以及Throw. 这主要是为了检测错误, 例如 <code>if (ex) break</code>. </p>
+<p>控制流语句的名称，不能用作变量、函数、类或窗口组名称. 包括If, Else, Loop, LoopFiles, LoopRead, LoopReg, LoopParse, For, While, Until, Break, Continue, Goto, Gosub, Return, Try, Catch, Finally以及Throw. 这主要是为了检测错误, 例如 <code>if (ex) break</code>. </p>
 <p>变量名解析需要一个结束百分号, 和v1一样 (but not early v2 alphas).</p>
-<p>文本和output var args和双引号字符串不仅可以包含 <code>%variables%</code>, 还可以包含任意在百分比符号之间的表达式. 字符串和表达式可以嵌套到任何深度. <code>%(%varname%)%</code> 是有效的, 并将在字符串中执行两次变量名解析, 或表达式中执行三次变量名解析. </p>
+<p>文本和output var args和双引号字符串不仅可以包含 <code>%variables%</code>, 还可以包含在百分比符号之间的任意表达式. 字符串和表达式可以嵌套到任何深度. <code>%(%varname%)%</code> 是有效的, 并将在字符串中执行两次变量名解析, 或表达式中执行三次变量名解析. </p>
 <p>Double-derefs are now consistent with variables resolved at 
 load-time. That is, a dynamic variable reference will resolve to a 
 (non-super) global only if the function is assume-global or the variable
@@ -24,8 +24,8 @@ load-time. That is, a dynamic variable reference will resolve to a
  the <code>vVariable</code> option of <code>Gui</code>.)</p>
 <p>变量名为空或太长, 而导致解析失败的, 会显示错误消息, 并导致线程中止, 而不是默默地产生一个空字符串. 这使得它们和输入/输出变量的行为更一致. 在变量名称中使用非法字符, 已经会导致报错, 并且仍然如此.</p>
 <p>Declaring a local variable in a function does not make the function assume-global.</p>
-<p><code>#MustDeclare [On|Off]</code> 命令启用或禁用"必须声明模式". 如果在库文件中使用, 则只影响该库文件, 和任何该库文件显式#includes的文件. However, it inherits its default setting from the main script. 它是位置相关的, 但不能在函数中使用(由于以下原因). Functions default to either assume-local or must-declare, 具体取决于函数定义时的设置, 但这可以通过使用不带变量名的 <code>Global</code>, <code>Local</code> or <code>Static</code> 来覆盖.</p>
-<p><code>Var varname</code> 声明一个全局变量, 而不会使其成为超级全局变量 (默认在所有函数中可见). 只有在启用 <code>#MustDeclare</code> 时, 这些声明才是必需的.</p>
+<p><code>#MustDeclare [On|Off]</code> 启用或禁用"必须声明模式". 如果在库文件中使用, 则只影响该库文件, 和任何该库文件显式#includes的文件. 但是,它仍然从主脚本继承了默认设置. 它是位置相关的, 但不能在函数中使用(由于以下原因). 函数中的变量, 默认是本地变量还是必须显式声明, 具体取决于函数定义时的设置, 但这可以通过使用不带变量名的 <code>Global</code>, <code>Local</code> 或 <code>Static</code> 来覆盖.</p>
+<p><code>Var varname</code> 声明一个全局变量, 而不会使其成为超级全局变量(即默认在所有函数中可见). 只有在启用 <code>#MustDeclare</code> 时, 这些声明才是必需的.</p>
 <h3 id="expressions">表达式</h3>
 <p>Quoted literal strings can be written with <code>"double"</code> or <code>'single'</code> quote marks, but must begin and end with the same mark. Both allow nested expressions such as <code>"Next year is %A_Year+1%"</code>.
  Literal quote marks are written by preceding the mark with an escape 
