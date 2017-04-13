@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html><head>
+<title>v2的改动</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">pre code{background:none;border:none;margin:0;padding:0;}</style>
+<style type="text/css">.highlight{background:#ffffff;}.highlight .c{color:#999988;font-style:italic}.highlight .err{color:#a61717;background-color:#e3d2d2}.highlight .k{font-weight:bold}.highlight .o{font-weight:bold}.highlight .cm{color:#999988;font-style:italic}.highlight .cp{color:#999999;font-weight:bold}.highlight .c1{color:#999988;font-style:italic}.highlight .cs{color:#999999;font-weight:bold;font-style:italic}.highlight .gd{color:#000000;background-color:#ffdddd}.highlight .gd .x{color:#000000;background-color:#ffaaaa}.highlight .ge{font-style:italic}.highlight .gr{color:#aa0000}.highlight .gh{color:#999999}.highlight .gi{color:#000000;background-color:#ddffdd}.highlight .gi .x{color:#000000;background-color:#aaffaa}.highlight .go{color:#888888}.highlight .gp{color:#555555}.highlight .gs{font-weight:bold}.highlight .gu{color:#aaaaaa}.highlight .gt{color:#aa0000}.highlight .kc{font-weight:bold}.highlight .kd{font-weight:bold}.highlight .kp{font-weight:bold}.highlight .kr{font-weight:bold}.highlight .kt{color:#445588;font-weight:bold}.highlight .m{color:#009999}.highlight .s{color:#d14}.highlight .na{color:#008080}.highlight .nb{color:#0086B3}.highlight .nc{color:#445588;font-weight:bold}.highlight .no{color:#008080}.highlight .ni{color:#800080}.highlight .ne{color:#990000;font-weight:bold}.highlight .nf{color:#990000;font-weight:bold}.highlight .nn{color:#555555}.highlight .nt{color:#000080}.highlight .nv{color:#008080}.highlight .ow{font-weight:bold}.highlight .w{color:#bbbbbb}.highlight .mf{color:#009999}.highlight .mh{color:#009999}.highlight .mi{color:#009999}.highlight .mo{color:#009999}.highlight .sb{color:#d14}.highlight .sc{color:#d14}.highlight .sd{color:#d14}.highlight .s2{color:#d14}.highlight .se{color:#d14}.highlight .sh{color:#d14}.highlight .si{color:#d14}.highlight .sx{color:#d14}.highlight .sr{color:#009926}.highlight .s1{color:#d14}.highlight .ss{color:#990073}.highlight .bp{color:#999999}.highlight .vc{color:#008080}.highlight .vg{color:#008080}.highlight .vi{color:#008080}.highlight .il{color:#009999}.pl-c{color:#969896;}.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv{color:#0086b3;}.pl-e,.pl-en{color:#795da3;}.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf{color:#333;}.pl-ent{color:#63a35c;}.pl-k,.pl-s,.pl-st{color:#a71d5d;}.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v{color:#df5000;}.pl-id{color:#b52a1d;}.pl-ii{background-color:#b52a1d;color:#f8f8f8;}.pl-sr .pl-cce{color:#63a35c;font-weight:bold;}.pl-ml{color:#693a17;}.pl-mh,.pl-mh .pl-en,.pl-ms{color:#1d3e81;font-weight:bold;}.pl-mq{color:#008080;}.pl-mi{color:#333;font-style:italic;}.pl-mb{color:#333;font-weight:bold;}.pl-md,.pl-mdhf{background-color:#ffecec;color:#bd2c00;}.pl-mdht,.pl-mi1{background-color:#eaffea;color:#55a532;}.pl-mdr{color:#795da3;font-weight:bold;}.pl-mo{color:#1d3e81;}.task-list{padding-left:10px;margin-bottom:0;}.task-list li{margin-left:20px;}.task-list-item{list-style-type:none;padding-left:10px;}.task-list-item label{font-weight:400;}.task-list-item.enabled label{cursor:pointer;}.task-list-item+.task-list-item{margin-top:3px;}.task-list-item-checkbox{display:inline-block;margin-left:-20px;margin-right:3px;vertical-align:1px;}</style>
+<link href="v2-changes_files/theme.css" rel="stylesheet" type="text/css" media="all">
+<style id="zoomLevel-styles"></style></head>
+<body>
+<h1 id="changes-from-v1-1-to-v2-0">v1.1到v2.0的改动</h1>
+<h2 id="language">Language</h2>
+<h3 id="legacy-syntax-removed">删除遗留语法</h3>
+<p>删除字面量赋值: <code>var = value</code></p>
+<p>删除 <code>If Var =|&lt;&gt;|&lt;|&gt;|&lt;=|&gt;= Value</code>; 这些现在都被解释为表达式.</p>
+<h3 id="variables">变量</h3>
+<p>变量名称不能以数字开头, 并且不能包含以前允许的这些字符: <code>@ # $</code>. 只允许字母、数字、下划线和非ASCII字符.</p>
+<p>控制流语句的名称，不能用作变量、函数、类或窗口组名称. 这包括If, Else, Loop, LoopFiles, LoopRead, LoopReg, LoopParse, For, While, Until, Break, Continue, Goto, Gosub, Return, Try, Catch, Finally以及Throw. 这主要是为了检测错误, 例如 <code>if (ex) break</code>. </p>
+<p>变量名解析需要一个结束百分号, 和v1一样 (but not early v2 alphas).</p>
+<p>文本和output var args和双引号字符串不仅可以包含 <code>%variables%</code>, 还可以包含任意在百分比符号之间的表达式. 字符串和表达式可以嵌套到任何深度. <code>%(%varname%)%</code> 是有效的, 并将在字符串中执行两次变量名解析, 或表达式中执行三次变量名解析. </p>
+<p>Double-derefs are now consistent with variables resolved at 
+load-time. That is, a dynamic variable reference will resolve to a 
+(non-super) global only if the function is assume-global or the variable
+ is declared as global in the function. (Important: this also applies to
+ the <code>vVariable</code> option of <code>Gui</code>.)</p>
+<p>变量名为空或太长, 而导致解析失败的, 会显示错误消息, 并导致线程中止, 而不是默默地产生一个空字符串. 这使得它们和输入/输出变量的行为更一致. 在变量名称中使用非法字符, 已经会导致报错, 并且仍然如此.</p>
+<p>Declaring a local variable in a function does not make the function assume-global.</p>
+<p><code>#MustDeclare [On|Off]</code> 命令启用或禁用"必须声明模式". 如果在库文件中使用, 则只影响该库文件, 和任何该库文件显式#includes的文件. However, it inherits its default setting from the main script. 它是位置相关的, 但不能在函数中使用(由于以下原因). Functions default to either assume-local or must-declare, 具体取决于函数定义时的设置, 但这可以通过使用不带变量名的 <code>Global</code>, <code>Local</code> or <code>Static</code> 来覆盖.</p>
+<p><code>Var varname</code> 声明一个全局变量, 而不会使其成为超级全局变量 (默认在所有函数中可见). 只有在启用 <code>#MustDeclare</code> 时, 这些声明才是必需的.</p>
+<h3 id="expressions">表达式</h3>
+<p>Quoted literal strings can be written with <code>"double"</code> or <code>'single'</code> quote marks, but must begin and end with the same mark. Both allow nested expressions such as <code>"Next year is %A_Year+1%"</code>.
+ Literal quote marks are written by preceding the mark with an escape 
+character - `" or `' - or by using the opposite type of quote mark: <code>'"42" is the answer'</code>. Doubling the quote marks has no special meaning, and causes an error since auto-concat requires a space.</p>
+<p>The operators <code>&amp;&amp;</code>, <code>||</code>, <code>and</code> and <code>or</code> yield whichever value determined the result, similar to JavaScript and Lua. For example, <code>"" or "default"</code> yields <code>"default"</code> instead of <code>1</code>. Scripts which require a pure boolean value (0 or 1) can use something like <code>!!(x or y)</code> or <code>(x or y) ? 1 : 0</code>.</p>
+<p>Auto-concat now requires at least one space or tab in all cases (the v1 documentation says there "should be" a space).</p>
+<p>The result of a multi-statement expression such as <code>x(), y()</code>
+ is the last (right-most) sub-expression instead of the first 
+(left-most) sub-expression. In both v1 and v2, the sub-expressions are 
+evaluated in left to right order.</p>
+<p>Equals after a comma is no longer assignment: <code>y=z</code> in <code>x:=y, y=z</code> is an ineffectual comparison instead of an assignment.</p>
+<p><code>:= += -= *= /= ++ --</code> have consistent behaviour regardless of whether they are used on their own or combined with other operators, such as with <code>x := y, y += 2</code>. For instance, <code>x := %y%()</code> no longer assigns an empty string to x if the dynamic call fails.</p>
+<p>Scientific notation can be used without a decimal point (but produces a floating-point number anyway).</p>
+<p>The expressions <code>funcName[""]()</code> and <code>funcName.()</code> no longer call a function by name. Omitting the method name as in <code>.()</code> now causes a load-time error message. 使用<code>%funcName%()</code> 代替.</p>
+<p><code>var :=</code> with no r-value is treated as an error at load-time. In v1 it was equivalent to <code>var := ""</code>, but silently failed if combined with another expression - for example: <code>x :=, y :=</code>.</p>
+<p>Where a literal string is followed by an ambiguous unary/binary operator, an error is reported at load-time. For instance, <code>"x" &amp;y</code> is probably supposed to auto-concatenate <code>"x"</code> with the address of <code>y</code>, but technically it is an invalid bitwise-and operation.</p>
+<p>In an expression, the word <code>new</code> is no longer treated as a variable under any circumstances. More complex expressions are supported; e.g. <code>new (getClass())(params)</code> or <code>new new {...}(inner_prms)(outer_prms)</code>.</p>
+<p>Class var initializers - which take the form of assignments in the 
+class body but outside of any method body - no longer trigger the __Set 
+meta-function.</p>
+<p><code>word ?x : y</code>, <code>word ++</code> and <code>word --</code> 不再是表达式, 因为word可能是用户定义的命令. 要使用三元操作符, 后置自增或自减操作符, 要么省略变量与操作符之间的空格, 要么将变量或表达式包裹在圆括号中.</p>
+<p>新操作符 <code>is</code> 替换掉 <code>if var is type</code>. 由于 <em>type</em> 是字符串, 它必须包含在引号中 (或是变量). 支持的类型名称和以前相同, 但新增了 <code>object</code> 和 <code>byref</code>类型. Additionally <code>x is y</code>, where <em>y</em> is an object, checks if <em>x</em> derives from <em>y</em>, directly or indirectly.</p>
+<p>Keywords <code>contains</code> and <code>in</code> are reserved for future use.</p>
+<p>Address-of: Since pure numbers and strings are now distinct types, <code>&amp;(var := 123)</code>
+ now returns the address of an int64 instead of the address of a string.
+ For consistency, VarSetCapacity returns 6 (the size of int64 minus a 
+null terminator).</p>
+<p>String length is now cached during expression evaluation. This 
+improves performance and allows strings to contain binary zero. In 
+particular:</p>
+<ul>
+<li>Concatenation of two strings where one or both contain binary zero 
+no longer causes truncation of the data. However, passing the result to 
+MsgBox or similar will only display up to the first binary zero.</li><li>The case-sensitive equality operator (<code>==</code>) can be used to compare binary data. The other comparison operators only "see" up to the first binary zero.</li><li>Binary
+ data can be returned from functions and assigned to objects. However, 
+doing so with ClipboardAll data causes it to revert to a normal string, 
+preventing it from being restored to the Clipboard later (this may yet 
+be fixed).</li></ul>
+<p>Many commands and functions still expect null-terminated strings, so will only "see" up to the first binary zero.</p>
+<h3 id="objects">Objects</h3>
+<p>Keys are stored differently than on v1 in a few cases:</p>
+<ul>
+<li><p>Quoted strings in v1 are always considered non-numeric if used directly, so <code>x["1"]</code> and <code>x[a:="1"]</code>
+ were not equivalent. This was a quirk of the v1 type system and does 
+not apply to v2. The following explanations ignore this quirk, for 
+brevity.</p>
+</li><li><p>Pure integers which do not fit within the integer key data 
+type on 32-bit builds are truncated on v1 but are stored as strings on 
+v2. This affects integers less than -2147483648 or greater than 
+2147483647, but only on 32-bit builds.</p>
+</li><li><p>Integer strings on v1 are always converted to pure/binary 
+integers, even if that causes loss of data. For example, the following 
+conversions are performed on v1, but on v2 the string is preserved:</p>
+<ul>
+<li>"01" → 1</li><li>"+2" → 2</li><li>"0x3" → 3</li><li>" &nbsp; 4 &nbsp; " → 4</li><li>"9999999999999999999" → 9223372036854775807 (x64) or -1 (x86) due to the constraints of the integer key data type.</li></ul>
+</li><li><p>As of v2.0-a067, numeric strings are converted to pure 
+integers where possible without causing the kind of data loss described 
+above. By contrast, v2.0-a048 to v2.0-a066 treat numeric strings and 
+pure integers as distinct.</p>
+</li></ul>
+<p>When calling a function via an object, the object itself is passed as
+ the first parameter regardless of where the function was stored (in the
+ object or one of its bases). In v1 this was not done if the function 
+was stored by name directly in the object.</p>
+<p>Where Fn is a function or object, <code>%Fn%()</code> calls <code>Fn.Call()</code> instead of <code>Fn[""]()</code>. Functions no longer support the nameless method.</p>
+<p>Where <code>Fn = this.Method</code>, <code>this.Method()</code> calls <code>Fn.Call(this)</code> instead of <code>Fn[this]()</code>. Function objects should implement a <em>Call</em> method instead of the <em>__Call</em> meta-function.  </p>
+<p>Where x is an Object, defining <code>x.base[key]</code> prevents <code>x.base.base.__Set()</code> from being called when an assignment like <code>x[key] := val</code> is performed. This is for consistency with __Get and __Call.</p>
+<p><code>new Obj()</code> now fails to create the object if the <code>__New</code> meta-method is defined and it could not be called (e.g. because it requires parameters and none were supplied).</p>
+<p>All built-in methods of Objects and SafeArrays no longer support the _ (underscore) prefix, except <code>_NewEnum</code>, which now requires it (for compatibility with COM objects). <code>ObjNewEnum(x)</code> is still equivalent to <code>x._NewEnum()</code> for Objects.</p>
+<p>The methods <code>Insert</code> and <code>Remove</code> have been removed. They were superseded by InsertAt, RemoveAt, Push, Pop, Delete and ObjRawSet in v1.1.21.</p>
+<p>Objects created within an expression or returned from a function are 
+now held until expression evaluation is complete, and then released. 
+This improves performance slightly and allows temporary objects to be 
+used for memory management within an expression, without fear of the 
+objects being freed prematurely.</p>
+<p>Objects can contain string values (but not keys) which contain binary
+ zero. Cloning an object preserves binary data in strings, but no longer
+ preserves data beyond the data length (FIXME: provide a way to set the 
+length).  </p>
+<h3 id="uncategorized">Uncategorized</h3>
+<p><code>:=</code> must be used in place of <code>=</code> when initializing a declared variable or optional parameter.</p>
+<p><code>If Expression,</code> allows a same-line action (command or expression) following the comma.</p>
+<p><code>Return %var%</code> now does a double-deref; previously it was equivalent to <code>Return var</code>.</p>
+<p>Command args are never expressions by default, except with control flow statements such as Return. The <code>%</code> (percent followed by space) prefix can still be used to force an expression.</p>
+<p>#Include is relative to the directory containing the current file by default.</p>
+<p>Labels defined in a function have local scope; they are visible only 
+inside that function and do not conflict with labels defined elsewhere. 
+Timers and Gui subroutines can be local, but must be set from within the
+ function.</p>
+<p><code>For k, v in obj</code> now "localizes" k and v. When the loop 
+breaks or completes, k and v are restored to the values they had before 
+the loop started.</p>
+<p>Escaping a comma in an expression causes it to be interpreted as the 
+multi-statement operator rather than a delimiter. This was already the 
+case for commands, but not variable declarations. For instance, <code>local x:=1, y:=2</code> declares two variables, but escaping the comma would cause it to be interpreted as <code>local x:=(1, y:=2)</code>. Note that continuation sections without the <code>,</code> option automatically escape commas.</p>
+<h3 id="continuation-sections">Continuation Sections</h3>
+<p>Smart LTrim: The default behaviour is to count the number of leading 
+spaces or tabs on the first line below the continuation section options,
+ and remove that many spaces or tabs from each line thereafter. If the 
+first line mixes spaces and tabs, only the first type of character is 
+treated as indentation. If any line is indented less than the first line
+ or with the wrong characters, all leading whitespace on that line is 
+left as is.</p>
+<p>Quote marks (single and double) are literal by default; this can be disabled with the <code>Q</code> option.</p>
+<p>Newline characters (<code>`n</code>) in expressions are treated as 
+spaces. This allows multi-line expressions to be written using a 
+continuation section with default options (i.e. omitting <code>Join</code>).</p>
+<h3 id="command-">Command()</h3>
+<p>All commands can now be called as functions, except for control flow statements such as Return. The translation rules are:</p>
+<ul>
+<li>If the command's first parameter is an output variable and the 
+second parameter is not, it becomes the return value. Otherwise, RunWait
+ and SendMessage return the value of ErrorLevel, and any other commands 
+which set ErrorLevel return 1 on success and 0 on failure. ErrorLevel is
+ still set as usual.</li><li>The remaining output variables are handled 
+like ByRef parameters, except that an exception is thrown if the 
+function is called incorrectly. Passing an empty string is equivalent to
+ omitting the parameter, but any other value (which is not a variable 
+reference) is not allowed.</li></ul>
+<p><strong>Incomplete:</strong> As commands and functions are still 
+internally distinct, defining a function with the same name as a command
+ currently overrides the command only for the function() style of 
+calling; i.e. the command style still calls the original command.</p>
+<p><strong>Experimental:</strong> Return, Until, Loop, LoopFiles, 
+LoopReg, LoopRead and LoopParse also support an expression-like syntax. 
+That is, the entire parameter list can be enclosed in a single set of 
+parentheses to force expressions for every parameter. However, these 
+commands are not functions; for instance, <code>x := return(y)</code> is not valid.</p>
+<h3 id="function-args-">Function, <em>Args</em></h3>
+<p>All functions can now be called as commands, including library 
+functions which haven't been manually #included. The translation rules 
+are currently:</p>
+<ul>
+<li>An output variable is inserted at the beginning of the parameter 
+list if the function is built-in or contains a "return". (Excluding new 
+built-in functions which don't have a return value other than to 
+indicate success/failure.)</li><li>All parameters support <code>%</code> for forcing an expression.</li><li>ByRef parameters are treated like input/output variables, but also allow expressions. <code>% var := "value"</code> would initialize <em>var</em> and pass it ByRef to the function.</li><li>OutputVar parameters of built-in functions are treated like output vars of commands; not as text or expressions.</li><li>All
+ other parameters default to normal text mode. This includes all 
+parameters of DllCall, NumGet and NumPut. To pass a variable reference, 
+use <code>% var</code> or <code>%var%</code>.</li><li>Literal commas 
+must always be escaped, even in the function's final parameter. This 
+might be changed, since it is currently inconsistent with built-in 
+commands.</li></ul>
+<p>Methods can also be called, with the following usage:</p>
+<ul>
+<li>In place of the command name, write the target object and method name separated by a dot. <code>Var.Method</code> and <code>Var.Property.Method</code> are both acceptable, but anything more complex (such as <code>Var[x].Method</code> or <code>%Var%.Method</code>) is not supported.</li><li>The return value is always discarded; there is no output variable.</li><li>All args are text by default.</li></ul>
+<h3 id="types">Types</h3>
+<p>In general, v2 produces more consistent results with any code that depends on the type of a value.</p>
+<p>In v1, a variable can contain both a string and a cached binary 
+number, which is updated whenever the variable is used as a number. 
+Since this cached binary number is the only means of detecting the type 
+of value, caching performed internally by expressions like <code>var+1</code> or <code>abs(var)</code> effectively changes the "type" of <code>var</code> as a side-effect. v2 disables this caching, so that <code>str := "123"</code> is always a string and <code>int := 123</code> is always an integer. Consequently, <code>str</code> needs to be converted every time it is used as a number (instead of just the first time).</p>
+<p>The built-in "variables" <code>true</code>, <code>false</code>, <code>A_PtrSize</code>, <code>A_IsUnicode</code>, <code>A_Index</code> and <code>A_EventInfo</code>
+ always return pure integers, not strings. They sometimes return strings
+ in v1 due to certain optimizations which have been superseded in v2.</p>
+<p>All literal numbers are converted to pure binary numbers at load time
+ and their string representation is discarded. For example, <code>MsgBox % 0x1</code> is equivalent to <code>MsgBox 1</code>, while <code>MsgBox % 1.0000</code> is equivalent to <code>MsgBox 1.0</code>
+ (because the default float formatting has changed). Storing a number in
+ a variable or returning it from a UDF retains its pure numeric status.</p>
+<p>Quoted literal strings and strings produced by concatenating with 
+quoted literal strings are no longer unconditionally considered 
+non-numeric. Instead, they are treated the same as strings stored in 
+variables or returned from functions. This has the following 
+implications:</p>
+<ul>
+<li>Quoted literal <code>"0"</code> is considered false.</li><li><code>("0xA") + 1</code> and <code>("0x" Chr(65)) + 1</code> produce 11 instead of failing.</li><li><code>x[y:="0"]</code> and <code>x["0"]</code> now behave the same.</li></ul>
+<p>The way that objects interpret different types of keys has changed. See the <a href="#objects"><em>Objects</em></a> section of this document for details.</p>
+<p>Relational operators such as =, &lt; and &gt;= work a little 
+differently. If both operands are numeric and at least one operand is <em>pure</em>,
+ they are compared numerically. Otherwise, they are compared 
+alphabetically. So for example, 54 and "530" are compared numerically, 
+while "54" and "530" are compared alphabetically. Additionally, strings 
+stored in variables are treated no differently from literal strings.</p>
+<p><code>Type(Value)</code> returns one of the following strings: 
+String, Integer, Float, Object or the specific class of a built-in 
+object type, such as FileObject or ComObject.</p>
+<h2 id="library">Library</h2>
+<p>Removed commands:</p>
+<ul>
+<li>Asc() (use Ord())</li><li>AutoTrim (use Trim())</li><li>ComObjMissing() (write two consecutive commas instead)</li><li>ComObjUnwrap() (use ComObjValue() instead, and ObjAddRef() if needed)</li><li>ComObjEnwrap() (use ComObject() instead, and ObjAddRef() if needed)</li><li>ComObjXXX()
+ where XXX is anything other than one of the explicitly defined ComObj 
+functions (use ComObjActive() or ComObject() instead).  </li><li>EnvDiv</li><li>EnvMult</li><li>EnvUpdate (it is of very limited usefulness and can be replaced with a simple SendMessage)</li><li>FileReadLine (use a file-reading loop or FileOpen)</li><li>IfXXX (changes to MsgBox made IfMsgBox obsolete)</li><li>If between/is/in/contains</li><li>Progress (use Gui)</li><li>SetBatchLines (-1 is now the default behaviour)</li><li>SetEnv</li><li>SetFormat (format() can be used to format a string)</li><li>SoundGetWaveVolume/SoundSetWaveVolume
+ (slightly different behaviour to SoundGet/SoundSet regarding balance, 
+but neither one preserves balance)</li><li>SplashImage (use Gui)</li><li>SplashTextOn/Off (use Gui)</li><li>StringGetPos (use InStr)</li><li>StringLeft<br>StringLen<br>StringMid<br>StringRight<br>StringTrimLeft<br>StringTrimRight -- use SubStr in place of these commands.</li><li>StringReplace (use StrReplace instead)</li><li>StringSplit (use StrSplit instead)</li><li>Transform (Deref sub-command is now a separate command)</li><li>WinGetActiveStats</li><li>WinGetActiveTitle</li><li>#CommentFlag</li><li>#Delimiter</li><li>#DerefChar</li><li>#EscapeChar</li><li>#LTrim</li><li>#MaxMem</li><li>#NoEnv (now default behaviour)</li></ul>
+<p>Renamed commands:</p>
+<ul>
+<li>ComObjParameter() -&gt; ComObject()</li><li>DriveSpaceFree -&gt; DriveGet sub-command SpaceFree</li><li>EnvAdd -&gt; DateAdd()</li><li>EnvSub -&gt; DateDiff()</li><li>FileCopyDir -&gt; DirCopy</li><li>FileCreateDir -&gt; DirCreate</li><li>FileMoveDir -&gt; DirMove</li><li>FileRemoveDir -&gt; DirDelete</li><li>FileSelectFile -&gt; FileSelect</li><li>FileSelectFolder -&gt; DirSelect</li><li>StringLower -&gt; StrLower (modified)</li><li>StringUpper -&gt; StrUpper (modified)</li><li>Transform Deref -&gt; Deref</li><li>UrlDownloadToFile -&gt; Download</li><li>WinMenuSelectItem -&gt; MenuSelect</li></ul>
+<p>Removed undocumented AutoIt2 commands (also removed in v1.1.09):</p>
+<ul>
+<li>HideAutoItWin</li><li>LeftClick</li><li>LeftClickDrag</li><li>Repeat / EndRepeat</li><li>RightClick</li><li>RightClickDrag</li></ul>
+<h3 id="modified-commands-functions">Modified Commands/Functions</h3>
+<p><code>Chr(0)</code> returns a string of length 1, containing a binary zero. This is a result of improved support for binary zero in strings.</p>
+<p><code>ComObject(pdsp)</code>, <code>ComObject(9, pdsp)</code> and <code>ComObject(13, pdsp)</code> no longer call AddRef by default; they default to "taking ownership" of the pointer. Most v1 scripts which use <code>ComObjEnwrap(pdsp)</code>
+ (within the first few pages of Google results) used it incorrectly; 
+i.e. they did not release their own copy of the pointer. For v2, the 
+script must call <code>ObjAddRef(pdsp)</code> before <code>ComObject(pdsp)</code>
+ if it does not "own" the reference (i.e. because the pointer will be 
+released automatically, either when the wrapper object is released or 
+immediately as a side-effect of querying for IDispatch within 
+ComObject()). The <em>flags</em> parameter now only affects SafeArrays.  </p>
+<p>ControlMove, ControlGetPos and ControlClick now use client 
+coordinates (like GuiControl) instead of window coordinates. Client 
+coordinates are relative to the top-left of the client area, which 
+excludes the window's title bar and borders. (Controls are rendered only
+ inside the client area.)</p>
+<p>DllCall: AStr is now input-only. Since the buffer is only ever as 
+large as the input string, it was never useful for output parameters. 
+This applies to WStr instead of AStr if compiled for ANSI (but v2 is 
+currently Unicode-only).</p>
+<p>DriveGet had an undocumented sub-command for setting the drive label. This has been removed. Use <code>Drive, Label</code> instead.</p>
+<p>FileOpen enables end-of-line translations by default; use the <code>*</code> option character to disable this.</p>
+<p>FileSetAttrib and FileSetTime: the OperateOnFolders? and Recurse? 
+parameters have been replaced with a single Mode parameter identical to 
+that of the Loop File command. For example, <code>FileSetAttrib, +a, *.zip, RF</code> (Recursively operate on Files only).</p>
+<p><code>File.ReadLine()</code> no longer includes the line ending in the return value.</p>
+<p><code>Func(Fn)</code> returns an empty string (instead of 0) if the function does not exist, and returns <em>Fn</em> itself if it is a function reference, instead of 0.</p>
+<p>GetKeyState is now only a function, not a command. The function always returns 0 or 1, even when called using command syntax.</p>
+<p>GroupAdd: Removed the Label parameter and related functionality. This
+ was an unintuitive way to detect when GroupActivate fails to find any 
+matching windows; ErrorLevel should be used instead.</p>
+<p><code>Hotkey</code> no longer defaults to the script's bottommost <code>#If</code>/<code>#IfWin</code>. Hotkey/hotstring threads default to the same criterion as the hotkey, so <code>Hotkey, %A_ThisHotkey%, Off</code>
+ turns off the current hotkey even if it is context-sensitive. All other
+ threads default to the last setting used by the auto-execute section, 
+which itself defaults to no criterion (global hotkeys).</p>
+<p><code>Hotkey</code> now always gives special treatment to the following values and never treats them as label/function names: <code>On</code>, <code>Off</code>, <code>Toggle</code>, <code>AltTab</code>, <code>ShiftAltTab</code>, <code>AltTabAndMenu</code>, <code>AltTabMenuDismiss</code>. The old behaviour was to use the label/function if it existed, but only if the <em>Label</em> parameter did not contain a variable reference or expression.</p>
+<p><code>Hotkey, If</code> now recognizes expressions which use the <code>and</code> or <code>or</code> operators. This did not work in v1 as these operators were replaced with <code>&amp;&amp;</code> or <code>||</code> at load time.</p>
+<p><code>Hotkey, If..</code> never sets ErrorLevel. An exception is thrown on failure.</p>
+<p>IniRead defaults to an empty string when the <em>Default</em> parameter is omitted, instead of the word <code>ERROR</code>. Additionally, ErrorLevel is set if an error occurs.</p>
+<p>Input now always returns end keys a-z in lower-case, consistent with other characters (on non-US keyboard layouts).</p>
+<p>InputBox has been given a syntax overhaul to make it easier to use (with fewer parameters). See <a href="#inputbox">InputBox</a> for usage.</p>
+<p>InStr's <em>CaseSensitive</em> parameter is now evaluated according to the usual boolean rules. In v1, non-numeric values were converted to <code>0</code>, which is <em>false</em>. In v2, non-numeric values other than <code>""</code> are considered <em>true</em>.</p>
+<p>MsgBox has had its syntax changed to prioritise its most commonly 
+used parameters and improve ease of use. "Smart" comma handling has been
+ removed; that is, it now handles commas the same as other functions. 
+See <a href="#msgbox">MsgBox</a> for usage.</p>
+<p>NumPut/NumGet: If a variable containing a pure number is passed to the <code>VarOrAddress</code> parameter, the variable's value is used rather than the address of the variable itself.</p>
+<p><code>Object()</code> and <code>{}</code> no longer cause <code>__Set</code> to be invoked for each key-value pair. <code>Object(obj)</code> no longer calls AddRef and returns the object's address. If required, use <code>ObjAddRef(addr := &amp;obj)</code> instead.</p>
+<p><code>OnExit</code> (the command) has been removed; use the OnExit() 
+function which was added in v1.1.20 instead. A_ExitReason has also been 
+removed; its value is available as a parameter of the OnExit callback 
+function.</p>
+<p><code>OnClipboardChange:</code> (the label) is no longer called 
+automatically if it exists. Use the OnClipboardChange() function which 
+was added in v1.1.20 instead.</p>
+<p>OnMessage has been changed to treat function names the same way that function references are treated in v1.1.20. That is, <code>OnMessage(x, "MyFunc")</code>
+ registers MyFunc for message x while still allowing other functions to 
+monitor message x. The function must be unregistered using <code>OnMessage(x, "MyFunc", 0)</code>, not <code>OnMessage(x, "")</code>, which is now an error. <code>OnMessage(x)</code> is also now an error. On failure, OnMessage throws an exception.</p>
+<p>PixelSearch and PixelGetColor use RGB values instead of BGR, for consistency with other commands.</p>
+<p>RegExMatch options O and P were removed; O (object) mode is now mandatory.</p>
+<p>Registry commands (RegRead, RegWrite, RegDelete): the new syntax 
+added in v1.1.21+ is now the only syntax. Root key and subkey are 
+combined. Instead of <code>RootKey, Key</code>, write <code>RootKey\Key</code>. To connect to a remote registry, use <code>\\ComputerName\RootKey\Key</code> instead of <code>\\ComputerName:RootKey, Key</code>.</p>
+<p>RegDelete with a blank or omitted <em>ValueName</em> now deletes the 
+key's default value, for consistency with RegWrite, RegRead and 
+A_LoopRegName. Keys can be deleted with the new RegDeleteKey command.</p>
+<p>RegRead had an undocumented 5-parameter mode, where the value type 
+was specified after the output variable. This has been removed.</p>
+<p>SendMessage sets ErrorLevel to <code>ERROR</code> instead of <code>FAIL</code> when it fails, for consistency with Run.</p>
+<p>Sort: the <em>VarName</em> parameter has been split into separate input/output parameters, for flexibility. Usage is now <code>Sort, OutputVar, InputText [, Options]</code> or <code>Output := Sort(Input [, Options])</code>.</p>
+<p>StrGet: If <em>Length</em> is negative, its absolute value indicates 
+the exact number of characters to convert, including any binary zeros 
+that the string might contain -- in other words, the result is always a 
+string of exactly that length. If <em>Length</em> is positive, the converted string ends at the first binary zero as in v1.  </p>
+<p>SysGet now only has numeric sub-commands; its other sub-commands have been split into functions. See <a href="#sub-commands">Sub-Commands</a> for details.</p>
+<p>TrayTip's usage has changed to <code>TrayTip [, Text, Title, Options]</code>. <em>Options</em> is a string of zero or more case-insensitive options delimited by a space or tab. The options are <code>Iconx</code>, <code>Icon!</code>, <code>Iconi</code>, <code>Mute</code> and/or any numeric value as before. TrayTip now shows even if <em>Text</em> is omitted (which is now harder to do by accident than in v1). The <em>Seconds</em> parameter no long exists (it had no effect on Windows Vista or later).</p>
+<p>WinMove no longer has special handling for the literal word <code>DEFAULT</code>. Omit the parameter or specify an empty string instead (this works in both v1 and v2).</p>
+<p><strong>Unsorted:</strong></p>
+<p>A negative <em>StartingPos</em> for InStr, SubStr, RegExMatch and 
+RegExReplace is interpreted as a position from the end, starting at 1. 
+Position -1 is the right-most character (in v1 this was position 0), and
+ position 0 is invalid.</p>
+<p>Loop Parse, SplitPath, StrUpper, StrLower and StrReplace now accept 
+normal text as input instead of a variable name, so to pass a variable, 
+use <code>%InputVar%</code> or <code>% InputVar</code>. The "input variable" concept is no longer used by any command.</p>
+<p>Commands which accept On/Off/Toggle now also accept 1/0/-1 (which is more convenient in an expresssion).</p>
+<p>The following commands/functions return a HWND as a pure integer instead of as a hexadecimal string:</p>
+<ul>
+<li>WinActive</li><li>WinExist</li><li>WinGetID</li><li>WinGetIDLast</li><li>WinGetList</li><li>WinGetStyle</li><li>WinGetStyleEx</li><li>WinGetControlsHwnd</li><li>ControlGet Hwnd</li><li>Gui +HwndVarname</li><li>GuiControlGet Hwnd</li><li>Gui Add, ..., +HwndVarname</li><li>MouseGetPos</li></ul>
+<p><code>A_ScriptHwnd</code> returns a string due to a technical limitation, but in decimal to be more consistent.</p>
+<h4 id="loop-sub-commands">Loop Sub-commands</h4>
+<p>Removed:</p>
+<pre><code>Loop, FilePattern [, IncludeFolders?, Recurse?]
+Loop, RootKey [, Key, IncludeSubkeys?, Recurse?]
+</code></pre><p>Use the following (added in v1.1.21) instead:</p>
+<pre><code>Loop, Files, FilePattern [, Mode]
+Loop, Reg, RootKey\Key [, Mode]
+</code></pre><p>Additionally, Loop Parse now accepts a normal string instead of an InputVar.</p>
+<pre><code>Loop, Parse, InputString [, Delimiters, OmitChars]
+</code></pre><p>Currently a compact form (LoopFiles, LoopReg, LoopRead 
+and LoopParse) is also supported, but this may be removed. (If you value
+ it, speak up.)</p>
+<p>Expression syntax can be used by writing the Loop command like a function call: <code>LoopRead(inputFile, outputFile)</code>.
+ OTB is supported with this syntax. Currently there must not be a space 
+between "Loop" and the sub-command name due to ambiguity.</p>
+<h4 id="inputbox">InputBox</h4>
+<p>InputBox, OutputVar [, Text, Title, <strong>Options</strong>, Default]</p>
+<p>The Options parameter accepts a string of zero or more 
+case-insensitive options delimited by a space or tab, similar to Gui 
+control options. For example, this includes all supported options: <code>x0 y0 w100 h100 T10.0 Password*</code>. <code>T</code> is timeout and <code>Password</code> has the same usage as the equivalent Edit control option.</p>
+<h4 id="msgbox">MsgBox</h4>
+<p>MsgBox [, Text, Title, Options, OutputVar]<br>Result := MsgBox([Text, Title, Options, OutputVar])</p>
+<p>The Options parameter accepts a string of zero or more 
+case-insensitive options delimited by a space or tab, similar to Gui 
+control options.</p>
+<ul>
+<li><code>Iconx</code>, <code>Icon?</code>, <code>Icon!</code> and <code>Iconi</code> set the icon.</li><li><code>Default</code> followed immediately by an integer sets the <em>n</em>th button as default.</li><li><code>T</code> followed immediately by an integer or floating-point number sets the timeout, in seconds.</li><li><code>Owner</code> followed immediately by a HWND sets the owner, overriding <code>Gui +OwnDialogs</code>.</li><li>One of the following mutually-exclusive strings sets the button choices: <code>OK</code>, <code>OKCancel</code>, <code>AbortRetryIgnore</code>, <code>YesNoCancel</code>, <code>YesNo</code>, <code>RetryCancel</code>, <code>CancelTryAgainContinue</code>, or just the initials separated by slashes (<code>o/c</code>, <code>y/n</code>, etc.), or just the initials without slashes.</li><li>Any numeric value, the same as in v1. Numeric values can be combined with string options, or Options can be a pure integer.</li></ul>
+<p>The return value, which is also stored in OutputVar, is the name of 
+the button, without spaces. These are the same strings that were used 
+with IfMsgBox in v1.</p>
+<p>OutputVar is provided to allow the use of command syntax (with 
+buttons other than OK), while still allowing the most often used 
+parameter (Text) to be the first parameter. Note that OutputVar is 
+entirely useless when Options is omitted.</p>
+<h4 id="sub-commands">Sub-Commands</h4>
+<p>Sub-commands of WinGet, WinSet and Process have been replaced with 
+individual functions, and the main commands have been removed. Excluding
+ the obsolete Cmd/Attribute parameter, usage is the same as before 
+except for the following sub-commands:</p>
+<ul>
+<li>WinSet Enable/Disable -&gt; WinSetEnabled On/Off/Toggle/1/0, WinTitle, etc.</li><li>WinSet Top/Bottom -&gt; WinMoveTop/WinMoveBottom, WinTitle, etc.</li><li>WinSet Redraw -&gt; WinRedraw, WinTitle, etc.</li><li>Process Priority -&gt; ProcessSetPriority, Priority, PID-or-Name</li><li>ProcessExist,
+ ProcessClose, ProcessWait and ProcessWaitClose currently all return the
+ PID, have an OutputVar when used with command syntax (this may change),
+ and don't set ErrorLevel.</li><li>WinSet Topmost and Trans were removed. Use WinSetAlwaysOnTop and WinSetTransparent instead.</li><li>WinGet ControlList -&gt; WinGetControls (returns an array).</li><li>WinGet ControlListHwnd -&gt; WinGetControlsHwnd (returns an array).</li><li>WinGet List -&gt; WinGetList (returns an array).</li></ul>
+<p>When called using function syntax, all WinSet' functions return 1 on 
+success, 0 on failure, while ErrorLevel is set to 0 on success, 1 on 
+failure.</p>
+<p>The following functions were formerly sub-commands of SysGet:</p>
+<pre><code>Exists  := MonitorGet(N, Left, Top, Right, Bottom)
+Exists  := MonitorGetWorkArea(N, Left, Top, Right, Bottom)
+Count   := MonitorGetCount()
+Primary := MonitorGetPrimary()
+Name    := MonitorGetName(N)
+</code></pre><h3 id="new-commands-functions">New Commands/Functions</h3>
+<p><code>DirExist(Path)</code>, with usage similar to FileExist.</p>
+<p><code>RegDeleteKey, RootKey\SubKey</code> deletes a registry key. (RegDelete now only deletes values, except when omitting all parameters in a registry loop.)</p>
+<h3 id="built-in-variables">Built-in Variables</h3>
+<p>A_OSVersion always returns a string in the format <code>major.minor.build</code>, such as <code>6.1.7601</code> for Windows 7 SP1. A_OSType has been removed as only NT-based systems are supported.</p>
+<p>Renamed:</p>
+<ul>
+<li>A_LoopFileFullPath -&gt; A_LoopFilePath (returns a relative path if 
+the Loop's parameter was relative, so "full path" was misleading)</li><li>A_LoopFileLongPath -&gt; A_LoopFileFullPath</li><li>ComSpec -&gt; A_ComSpec</li></ul>
+<p>Removed:</p>
+<ul>
+<li>ProgramFiles (use A_ProgramFiles)</li><li>A_AutoTrim</li><li>A_BatchLines</li><li>A_ExitReason</li><li>A_FormatFloat</li><li>A_FormatInteger</li></ul>
+<p>Added:</p>
+<ul>
+<li>A_InitialWorkingDir (see <a href="#default-settings">Default Settings</a>)</li></ul>
+<p>The following built-in variables can be assigned values:</p>
+<ul>
+<li>A_ControlDelay</li><li>A_CoordMode..</li><li>A_DefaultMouseSpeed</li><li>A_DetectHiddenText</li><li>A_DetectHiddenWindows</li><li>A_EventInfo</li><li>A_FileEncoding</li><li>A_Index: For counted loops, modifying this affects how many iterations are performed.  </li><li>A_KeyDelay</li><li>A_KeyDelayPlay</li><li>A_KeyDuration</li><li>A_KeyDurationPlay</li><li>A_MouseDelay</li><li>A_MouseDelayPlay</li><li>A_LastError: Calls the Win32 SetLastError() function.</li><li>A_MouseDelay</li><li>A_RegView</li><li>A_ScriptName: Changes the default dialog title.</li><li>A_SendLevel</li><li>A_SendMode</li><li>A_StoreCapslockMode</li><li>A_StringCaseSense</li><li>A_TitleMatchMode</li><li>A_TitleMatchModeSpeed</li><li>A_WinDelay</li><li>A_WorkingDir: Same as calling SetWorkingDir.</li></ul>
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="expressions">表达式</h3>
+<p>An exception is thrown when any of the following failures occur (instead of ignoring the failure):</p>
+<ul>
+<li>Failure to allocate memory for a built-in function's return value, concatenation or the expression's result.</li><li>Stack underflow (typically caused by a syntax error).</li><li>Attempted assignment to something which isn't a variable (or array element).</li><li>Attempted assignment to a read-only variable.</li><li>Attempted double-deref with an empty name, such as <code>fn(%empty%)</code>.  </li><li>Failure to execute a dynamic function call or method call.</li><li><code>x[y,z]</code> fails due to <code>x[y]</code> containing a non-object value.</li><li>An
+ invocation fails because the target is not an object, or the 
+method/property is not handled. For associative arrays, only a method 
+call can cause this.  </li><li>An object-assignment fails due to memory allocation failure.</li><li>Might be impossible: Attempted to allocate more than 200 temporary strings or object references (<em>at most</em>
+ one allocation per function call, object operator, concatenation or the
+ expression's result). Does not include all allocations. The limit in v1
+ was 100 such strings (object references did not count).  </li></ul>
+<p>Some of the conditions above are detected in v1, but not mid-expression; for instance, <code>A_AhkPath := x</code> is detected in v1 but <code>y := x, A_AhkPath := x</code> is only detected in v2.</p>
+<p>The operators <code>+=</code>, <code>-=</code>, <code>--</code> and <code>++</code> treat an empty variable as 0 (for <code>+=</code> and <code>-=</code>,
+ this only applies to the left-hand side). In v1, this was true only for
+ standalone use of the operator, not when used mid-expression or with 
+multi-statement comma.</p>
+<h3 id="commands">Commands</h3>
+<p>Commands generally use ErrorLevel to report failure, and sometimes 
+throw an exception (e.g. for invalid parameters). This is similar to v1,
+ though behaviour has changed in some specific cases. However, wrapping 
+commands in a TRY block no longer affects this behaviour, so behaviour 
+is more predictable.</p>
+<p>Commands and built-in functions throw an exception when invalid 
+parameters are detected (but not all invalid parameters are detected), 
+or when a memory allocation fails.</p>
+<p>DllCall throws exceptions instead of setting ErrorLevel.</p>
+<p>RegExMatch and RegExReplace never set ErrorLevel, instead throwing an
+ exception if there is an error. This includes syntax errors in the 
+regex pattern and PCRE execution errors.</p>
+<p>TV/LV/SB functions throw an exception if the default GUI doesn't exist or it has no TreeView/ListView/StatusBar control.</p>
+<p>Math functions return the empty string <code>""</code> if any of their inputs are non-numeric, or if the operation is invalid (such as division by zero).</p>
+<h2 id="other">Other</h2>
+<p>Command-line args are stored in an array and assigned to the super-global var <code>A_Args</code> instead of a pseudo-array of numbered global vars. If no args were passed to the script, <code>A_Args</code> contains an empty array. The expression <code>A_Args.Length()</code> returns the number of args and <code>A_Args[1]</code> returns the first arg.</p>
+<p>Mouse wheel hotkeys set A_EventInfo to the wheel delta as reported by
+ the mouse driver instead of dividing by 120. Generally it is a multiple
+ of 120, but some mouse hardware/drivers may report wheel movement at a 
+higher resolution.</p>
+<p>ErrorLevel can safely be assigned an object without risk of it being 
+lost when the thread is interrupted. In v1, the thread-specific nature 
+of ErrorLevel was implemented by saving the previous thread's ErrorLevel
+ as a string when a new thread starts and restoring it when the new 
+thread terminates.</p>
+<p>ErrorLevel is reset to 0 for each new thread. In v1, it retained the 
+value from the previous thread, which is also the same value it is reset
+ to when the new thread finishes.</p>
+<p>FileSelectFile had two multi-select modes, accessible via options 4 
+and M. Option 4 and the corresponding mode have been removed; they had 
+been undocumented for some time.</p>
+<p>RegEx newline matching defaults to (*ANYCRLF) and (*BSR_ANYCRLF); `r 
+and `n are recognized in addition to `r`n. The `a option implicitly 
+enables (*BSR_UNICODE).</p>
+<h3 id="gui">Gui</h3>
+<p>Progress Gui controls no longer have the PBS_SMOOTH style by default,
+ so they are now styled according to the system visual style (e.g. Luna 
+in XP or Aero in Vista/7).</p>
+<p>GuiSize and GuiDropFiles labels no longer set ErrorLevel. Use A_EventInfo instead.</p>
+<h3 id="persistence">Persistence</h3>
+<p>Scripts are "persistent" while at least one of the following conditions is satisfied:</p>
+<ul>
+<li>At least one hotkey or hotstring has been defined by the script.  </li><li>At least one message monitor is active (installed by OnMessage).</li><li>At least one Gui is visible.  </li><li>At least one script timer is currently enabled.</li><li>At least one OnClipboardChange callback function has been set.</li><li>The tray icon is visible and its menu has custom items.</li><li>#Persistent was used.</li></ul>
+<p>If the last script thread finishes or a Gui is closed or destroyed 
+and none of the above conditions are satisfied, the script terminates.</p>
+<p>By contrast, v1 scripts are "persistent" when at least one of the following is true:</p>
+<ul>
+<li>At least one hotkey or hotstring has been defined by the script.</li><li>Gui or OnMessage() appears anywhere in the script.</li><li>The keyboard hook or mouse hook is installed.</li><li>Input has been called.</li><li>#Persistent was used.</li></ul>
+<h3 id="default-settings">Default Settings</h3>
+<ul>
+<li>#NoEnv has been removed; use EnvGet instead if an equivalent built-in variable is not available.</li><li>SendMode defaults to Input instead of Event.</li><li>Title matching mode defaults to 2 instead of 1.</li><li>SetBatchLines has been removed, so all scripts run at full speed (equivalent to SetBatchLines -1 in v1).</li><li>The working directory defaults to <code>A_ScriptDir</code>. <code>A_InitialWorkingDir</code> contains the working directory which was set by the process which launched AutoHotkey.</li><li>#SingleInstance prompt behaviour is default for all scripts; #SingleInstance on its own activates Force mode.</li><li>ListLines Off</li><li>CoordMode defaults to Client (added in v1.1.05) instead of Window.</li></ul>
+
+
+ 
+</body></html>
