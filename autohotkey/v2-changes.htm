@@ -800,7 +800,7 @@ dd>p:first-child {
 <p>变量名解析需要一个结束百分号，和V1一样（但不同于早期的 V2 alpha版）。</p>
 <p>文本、输出变量参数和双引号字符串，不仅可以包含<code>%variables%</code> ，还可以包含在百分比符号之间的任意表达式。字符串和表达式可以嵌套到任何深度。 <code>%(%varname%)%</code>是有效写法，并将在字符串中执行两次变量名解析，或表达式中执行三次变量名解析。</p>
 <p>双层变量解析，现在随载入时的变量解析一起进行。也就是说，仅当函数为假设全局模式，或函数中的变量被声明为全局时，动态变量引用才被解析为全局（非超级全局）的。（重要提示：这也适用于<code>Gui</code>中的<code>v变量</code> ）。</p>
-<p>变量名为空或太长，而导致两层解析失败的，会显示错误消息，并导致线程中止，而不是默默地产生一个空字符串。这使得它们和输入/输出变量更加一致。在变量名称中使用非法字符，已经会导致报错，未来仍然如此。</p>
+<p>变量名为空或太长，而导致两层解析失败的，会显示错误消息，并导致线程中止，而不是默默地产生一个空字符串。这使得它们和输入/输出变量更加一致。在变量名称中使用非法字符，过去会导致报错，现在仍然如此。</p>
 <p>在函数中声明局部变量，不会使函数中的变量成为默认全局的（即函数的“假设全局模式”）。</p>
 <p><code>#MustDeclare [On|Off]</code>启用或禁用“显式声明模式”。如果在库文件中使用，则只影响该库文件，和任何该库文件显式#includes的文件。但是，仍然从主脚本继承了默认设置。它是位置相关的，但不能在函数中使用（由于以下原因）。函数关于假设局部变量或显式声明模式的设置，具体取决于函数定义时的设置，但可以使用不带变量的<code>Global</code> ， <code>Local</code>或<code>Static</code>进行重设置。</p>
 <p><code>Var varname</code>声明一个全局变量，但不会使其成为超级全局变量（即默认在所有函数中可见）。只有在启用<code>#MustDeclare</code>时，这些声明才必需。</p>
@@ -885,7 +885,7 @@ dd>p:first-child {
 <h2 id="library">图书馆</h2>
 <p>删除命令：</p>
 <ul>
-<li>ASC（）（使用奥德（））</li><li>自动微调（使用TRIM（））</li><li>ComObjMissing（）（写两个连续的逗号，而不是）</li><li>ComObjUnwrap（）（使用ComObjValue（）来代替，如果需要ObjAddRef（））</li><li>ComObjEnwrap（）（使用ComObject（）代替，并ObjAddRef（）如果需要的话）</li><li>ComObjXXX（）其中XXX比的明确定义ComObj功能之一的任何其他（使用ComObjActive（）或ComObject（）代替）。</li><li>EnvDiv</li><li>EnvMult</li><li>EnvUpdate（这是非常有限的有用性，并且可以用一个简单的SendMessage代替）</li><li>FileReadLine（使用文件读取循环或的FileOpen）</li><li>IfXXX（修改MSGBOX作出IfMsgBox过时）</li><li>如果之间的/是/在/载</li><li>进展（使用GUI）</li><li>SetBatchLines（-1现在是默认行为）</li><li>SETENV</li><li>SetFormat（格式（）可以用于格式的字符串）</li><li>SoundGetWaveVolume / SoundSetWaveVolume（稍有不同的行为SoundGet / SoundSet关于平衡，但没有一个保持平衡）</li><li>SplashImage（使用GUI）</li><li>SplashTextOn /关（使用GUI）</li><li>StringGetPos（使用InStr函数）</li><li>StringLeft<br>StringLen<br>StringMid<br>StringRight<br>StringTrimLeft<br>StringTrimRight  - 代替这些命令的使用SUBSTR。</li><li>StringReplace（使用StrReplace代替）</li><li>StringSplit（使用StrSplit代替）</li><li>变换（DEREF子命令现在是一个单独的命令）</li><li>WinGetActiveStats</li><li>WinGetActiveTitle</li><li>#CommentFlag</li><li>#Delimiter</li><li>#DerefChar</li><li>#EscapeChar</li><li>#LTrim</li><li>#MaxMem</li><li>#NoEnv（现在的默认行为）</li></ul>
+<li>ASC（）（使用奥德（））</li><li>自动微调（使用TRIM（））</li><li>ComObjMissing（）（写两个连续的逗号，而不是）</li><li>ComObjUnwrap（）（使用ComObjValue（）来代替，如果需要ObjAddRef（））</li><li>ComObjEnwrap（）（使用ComObject（）代替，并ObjAddRef（）如果需要的话）</li><li>ComObjXXX（）其中XXX比的明确定义ComObj功能之一的任何其他（使用ComObjActive（）或ComObject（）代替）。</li><li>EnvDiv</li><li>EnvMult</li><li>EnvUpdate（这是非常有限的有用性，并且可以用一个简单的SendMessage代替）</li><li>FileReadLine（使用文件读取循环或的FileOpen）</li><li>IfXXX（修改MSGBOX作出IfMsgBox过时）</li><li>如果之间的/是/在/载</li><li>进展（使用GUI）</li><li>SetBatchLines（-1现在是默认行为）</li><li>SETENV</li><li>SetFormat（格式（）可以用于格式的字符串）</li><li>SoundGetWaveVolume / SoundSetWaveVolume（稍有不同的行为SoundGet / SoundSet关于平衡，但没有一个保持平衡）</li><li>SplashImage（使用GUI）</li><li>SplashTextOn /关（使用GUI）</li><li>StringGetPos（使用InStr函数）</li><li>StringLeft<br>StringLen<br>StringMid<br>StringRight<br>StringTrimLeft<br>StringTrimRight  - 请使用SubStr代替这些命令。</li><li>StringReplace（使用StrReplace代替）</li><li>StringSplit（使用StrSplit代替）</li><li>变换（DEREF子命令现在是一个单独的命令）</li><li>WinGetActiveStats</li><li>WinGetActiveTitle</li><li>#CommentFlag</li><li>#Delimiter</li><li>#DerefChar</li><li>#EscapeChar</li><li>#LTrim</li><li>#MaxMem</li><li>#NoEnv（现在的默认行为）</li></ul>
 <p>重命名的命令：</p>
 <ul>
 <li>ComObjParameter（） - &gt; ComObject（）</li><li>DriveSpaceFree  - &gt; DriveGet子命令SpaceFree</li><li>EnvAdd  - &gt;使用DateAdd（）</li><li>EnvSub  - &gt;则DateDiff（）</li><li>FileCopyDir  - &gt; DirCopy</li><li>FileCreateDir  - &gt; DirCreate</li><li>FileMoveDir  - &gt; DirMove</li><li>FileRemoveDir  - &gt; DirDelete</li><li>FileSelectFile  - &gt; FileSelect</li><li>FileSelectFolder  - &gt; DirSelect</li><li>StringLower  - &gt; StrLower（修改）</li><li>StringUpper  - &gt; StrUpper（修改）</li><li>变换DEREF  - &gt; DEREF</li><li>UrlDownloadToFile  - &gt;下载</li><li>WinMenuSelectItem  - &gt; MenuSelect</li></ul>
@@ -931,7 +931,7 @@ dd>p:first-child {
 <p>WinMove不再有文字字特殊处理<code>DEFAULT</code> 。省略该参数或指定一个空字符串，而不是（这个工作在两个v1和v2）。</p>
 <p><strong>未排序：</strong></p>
 <p>对于InStr函数，SUBSTR REGEXMATCH和REGEXREPLACE负<em>StartingPos</em>被解释为从端部的位置，从1开始。位置-1是最右边的字符（在V1这是位置0），位置0是无效的。</p>
-<p>循环解析，SplitPath，StrUpper，StrLower和StrReplace现在接受正常的文本输入，而不是一个变量名，所以要通过一个变量，使用<code>%InputVar%</code>或<code>% InputVar</code> 。在“输入变量”的概念不再使用通过任何命令。</p>
+<p>Loop Parse，SplitPath，StrUpper，StrLower和StrReplace现在接受字面的文本输入，而不是变量，所以要传入一个变量，请使用<code>%InputVar%</code>或<code>% InputVar</code> 。“输入变量”这个概念，对于任何命令都不存在了。</p>
 <p>命令接受其开/关/切换现在还接受1/0 / -1（这是更方便的在expresssion）。</p>
 <p>下面的命令/函数返回一个HWND作为纯整数而不是作为十六进制字符串：</p>
 <ul>
