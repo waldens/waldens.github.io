@@ -7,7 +7,7 @@
   "tag_fg_color": "#ffffff",
   "tag_bg_color": "#00b050",
   "icon": "leaf",
-  "exported_at": "2017-05-20T22:55:54Z",
+  "exported_at": "2017-05-22T22:40:43Z",
   "agents": [
     {
       "type": "Agents::DeDuplicationAgent",
@@ -42,6 +42,13 @@
             "value": "string(.)"
           }
         },
+        "events_order": [
+          [
+            "{{_index_}}",
+            "number",
+            "true"
+          ]
+        ],
         "template": {
           "url": "{{ url | to_uri: \"http://mp.weixin.qq.com\" }}"
         }
