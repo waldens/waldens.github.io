@@ -7,7 +7,7 @@
   "tag_fg_color": "#ffffff",
   "tag_bg_color": "#00b050",
   "icon": "leaf",
-  "exported_at": "2017-05-22T22:40:43Z",
+  "exported_at": "2017-05-28T02:35:18Z",
   "agents": [
     {
       "type": "Agents::DeDuplicationAgent",
@@ -124,7 +124,7 @@
           "description": "微信公众号",
           "item": {
             "title": "【{{author}}】{{title}}",
-            "description": "{{desciption}}",
+            "description": "{{ desciption | replace: 'data-src', 'src' }}",
             "link": "{{url}}"
           },
           "link": "https://weixin.sogou.com/",
