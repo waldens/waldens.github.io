@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Version 1.1 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BHD BP Calc</title>
+  
+  <!-- Simple.css (https://github.com/kevquirk/simple.css) (license: MIT) -->
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">;
+
+  <!-- Alpine.js (https://github.com/alpinejs/alpine/) (license: MIT) -->
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+
+  <script>
+    /** Returns the View Model used by this page */
+    function vm() {
+      return {
+        size: null,
+        seeders: null,
+        internal: false,
+        donor: false,
+        time: null,
+        hours: 1,
+
+        /** Calculate the BP that will be earned */
+        calc_bp() {
+          const size = Number(this.size);
+          const seeders = Number(this.seeders);
+          const time = Number(this.time);
+          if (Number.isNaN(size) || Number.isNaN(seeders) || Number.isNaN(time) ||
+            size == 0 || seeders == 0 || time == 0) {
+            return null;
+          }
+          
+          let bpPerHour = 0.000055 * size * 30;
+          
+          if (seeders <= 5) bpPerHour *= 2.75;
+          else if (seeders <= 7) bpPerHour *= 2;
+          else if (seeders <= 9) bpPerHour *= 1.25;
+          else if (seeders < 20) bpPerHour *= 1;
+          else if (seeders < 50) bpPerHour *= 0.9;
+          else bpPerHour *= 0.8;
+
+          if (this.internal) bpPerHour *= 2;
+          if (seeders <= 3) bpPerHour *= (4/3); // hero bonus
+          if (this.donor) bpPerHour *= 1.2;
+
+          // loop through each month, adding the 20% bonus
+          let monthBonus = 1;
+          let hours = time * this.hours;
+          let bp = 0;
+          while (hours > 0) {
+            if (hours > 720) {
+              bp += 720 * bpPerHour * monthBonus;
+              hours -= 720;
+              monthBonus += 0.2;
+            } else {
+              bp += hours * bpPerHour * monthBonus;
+              hours = 0;
+            }
+          }
+
+          return bp;
+        },
+
+        /** The amount of BP earned, formatted */
+        bp_earned() {
+          const bp = this.calc_bp();
+          if (bp == null) return "";
+
+          const format = Intl.NumberFormat(undefined, { maximumFractionDigits: 6 });
+          return format.format(bp);
+        },
+
+        /** The amount of GiB upload that can be bought, formatted */
+        gp_bought() {
+          const bp = this.calc_bp();
+          if (bp == null) return "";
+
+          const format = Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+          const gb = Math.floor(bp / 16000) * 512;
+          return format.format(gb);
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>BeyondHD BP Calculator</h1>
+    <p>Calculate how much BeyondHD bonus points you will earn over time</p>
+    <p>And how much upload you can buy</p>
+  </header>
+
+  <main x-data="vm()">
+    <p>
+      <label>Size (GiB)</label><br />
+      <input type="text" x-model="size" autocomplete="off" /><br />
+    </p>
+
+    <p>
+      <label># of Seeders</label><br />
+      <input type="text" x-model="seeders" autocomplete="off" /><br />
+    </p>
+
+    <p>
+      <label>
+        <input type="checkbox" x-model="internal" />
+        Internal
+      </label>
+    </p>
+
+    <p>
+      <label>
+        <input type="checkbox" x-model="donor" />
+        Donor
+      </label>
+    </p>
+
+    <p>
+      <label>Seed Time</label><br />
+      <input type="text" x-model="time" autocomplete="off" /><br />
+      <input type="radio" name="seedTime" value="1" x-model="hours" /> Hours
+      <input type="radio" name="seedTime" value="24" x-model="hours" /> Days
+      <input type="radio" name="seedTime" value="720" x-model="hours" /> Months
+    </p>
+
+    <p style="margin-top: 3em">
+      <label>BP Earned</label>
+      <input type="text" readonly style="width: 10em" :value="bp_earned()" />
+    </p>
+
+    <p>
+      <label>Upload Bought (GiB)</label>
+      <input type="text" readonly style="width: 7em" :value="gp_bought()" /><br />
+      <i>When buying 512 GiB with 16,000 BP</i>
+    </p>
+  </main>
+
+  <footer>
+    <p>Created by Ringh, for the BeyondHD Community</p>
+  </footer>
+</body>
+</html>
